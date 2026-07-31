@@ -6,6 +6,7 @@ import {
   TrendingUp,
   SlidersHorizontal,
   History,
+  GitCompare,
   PackageSearch,
   Truck,
   Database,
@@ -41,6 +42,7 @@ export const navGroups: NavGroup[] = [
       { title: '库存趋势', href: '/inventory-trend', icon: TrendingUp },
       { title: '人工调整', href: '/adjustments', icon: SlidersHorizontal },
       { title: '计划版本', href: '/versions', icon: History },
+      { title: '版本对比', href: '/versions/compare', icon: GitCompare },
     ],
   },
   {
