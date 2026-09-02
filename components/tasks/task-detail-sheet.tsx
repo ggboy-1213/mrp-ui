@@ -60,8 +60,8 @@ export function TaskDetailSheet({
               <div className="border-b px-4 py-2">
                 <TabsList variant="line" className="h-auto">
                   <TabsTrigger value="overview">任务概览</TabsTrigger>
-                  <TabsTrigger value="data">数据版本</TabsTrigger>
-                  <TabsTrigger value="param">参数版本</TabsTrigger>
+                  <TabsTrigger value="data">SCM 数据检查</TabsTrigger>
+                  <TabsTrigger value="param">计划参数</TabsTrigger>
                   <TabsTrigger value="exception">异常记录</TabsTrigger>
                   <TabsTrigger value="log">执行日志</TabsTrigger>
                 </TabsList>
@@ -69,7 +69,7 @@ export function TaskDetailSheet({
 
               <div className="min-h-0 flex-1 overflow-y-auto p-4">
                 <TabsContent value="overview"><OverviewTab task={task} /></TabsContent>
-                <TabsContent value="data"><DataTab task={task} /></TabsContent>
+                <TabsContent value="data"><DataCheckTab task={task} /></TabsContent>
                 <TabsContent value="param"><ParamTab task={task} /></TabsContent>
                 <TabsContent value="exception"><ExceptionTab task={task} /></TabsContent>
                 <TabsContent value="log"><LogTab task={task} /></TabsContent>
@@ -106,8 +106,35 @@ function OverviewTab({ task }: { task: PlanTask }) {
       </div>
 
       <div>
-        <p className="mb-2 text-sm font-medium text-foreground">计划范围</p>
+        <p className="mb-2 text-sm font-medium text-foreground">计划范围（Task Scope）</p>
         <ScopeTags scope={task.scope} />
+        <p className="mt-1.5 text-xs text-muted-foreground">
+          平台 / 仓库维度仅用于业务归类，不参与 MRP 引擎计算；引擎按 Country + SKU 组合执行。
+        </p>
+      </div>
+
+      <div>
+        <p className="mb-2 text-sm font-medium text-foreground">引擎计算单元（Country + SKU）</p>
+        <div className="overflow-hidden rounded-lg border border-border">
+          <Table className="text-sm">
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead>国家</TableHead>
+                <TableHead className="text-right">SKU 数量</TableHead>
+                <TableHead>计算状态</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {task.planningScopes.map((s) => (
+                <TableRow key={s.country}>
+                  <TableCell className="font-medium text-foreground">{s.country}</TableCell>
+                  <TableCell className="text-right tabular-nums">{s.skuCount.toLocaleString('zh-CN')}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground">{s.status}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       <div>
@@ -160,77 +187,127 @@ function FlowSteps({ steps }: { steps: TaskFlowStep[] }) {
   )
 }
 
-function DataTab({ task }: { task: PlanTask }) {
+function DataCheckTab({ task }: { task: PlanTask }) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-border">
-      <Table className="text-sm">
-        <TableHeader>
-          <TableRow className="hover:bg-transparent">
-            <TableHead>数据类型</TableHead>
-            <TableHead>版本号</TableHead>
-            <TableHead>数据日期</TableHead>
-            <TableHead className="text-right">数据量</TableHead>
-            <TableHead>导入人</TableHead>
-            <TableHead>导入时间</TableHead>
-            <TableHead>校验状态</TableHead>
-            <TableHead className="text-right">操作</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {task.dataVersions.map((d) => (
-            <TableRow key={d.type}>
-              <TableCell className="font-medium text-foreground">
-                {d.type}
-                {d.expired && <span className="ml-1 text-xs text-[oklch(0.5_0.13_60)]">已过期</span>}
-              </TableCell>
-              <TableCell className="font-mono text-xs text-muted-foreground">{d.version}</TableCell>
-              <TableCell className="text-xs text-muted-foreground">{d.dataDate}</TableCell>
-              <TableCell className="text-right tabular-nums">{d.rows.toLocaleString('zh-CN')}</TableCell>
-              <TableCell className="text-xs text-muted-foreground">{d.importedBy}</TableCell>
-              <TableCell className="font-mono text-xs text-muted-foreground">{d.importedAt}</TableCell>
-              <TableCell><ValidationBadge status={d.validation} /></TableCell>
-              <TableCell className="text-right">
-                <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">查看</Button>
-              </TableCell>
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg border border-border bg-muted/40 p-3 text-xs">
+        <span className="font-medium text-foreground">数据来源：SCM 实时对接</span>
+        <span className="text-success">通过 {task.validationSummary.passed}</span>
+        <span className="text-destructive">阻断 {task.validationSummary.blocking}</span>
+        <span className="text-[oklch(0.5_0.13_60)]">警告 {task.validationSummary.warnings}</span>
+        <span className="text-muted-foreground">计算快照：{task.snapshotTag}</span>
+      </div>
+      <div className="overflow-x-auto rounded-lg border border-border">
+        <Table className="text-sm">
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead>数据源</TableHead>
+              <TableHead className="text-right">数据量</TableHead>
+              <TableHead>最近同步</TableHead>
+              <TableHead className="text-right">问题数</TableHead>
+              <TableHead>检查状态</TableHead>
+              <TableHead className="text-right">操作</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {task.scmChecks.map((d) => (
+              <TableRow key={d.source}>
+                <TableCell className="font-medium text-foreground">{d.source}</TableCell>
+                <TableCell className="text-right tabular-nums">{d.rows.toLocaleString('zh-CN')}</TableCell>
+                <TableCell className="font-mono text-xs text-muted-foreground">{d.updatedAt}</TableCell>
+                <TableCell className={cn('text-right tabular-nums', d.issues > 0 ? 'text-destructive' : 'text-muted-foreground')}>
+                  {d.issues}
+                </TableCell>
+                <TableCell><ValidationBadge status={d.status} /></TableCell>
+                <TableCell className="text-right">
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">查看</Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   )
 }
 
 function ParamTab({ task }: { task: PlanTask }) {
+  const planRows = [
+    { label: '安全库存天数', value: `${task.planParams.safetyStockDays} 天` },
+    { label: 'QC 周期', value: `${task.planParams.qcDays} 天` },
+    { label: '国际物流时效', value: `${task.planParams.intlLeadTime} 天` },
+    { label: '发运箱规倍数', value: `${task.planParams.cartonMultiple} 件 / 箱` },
+  ]
   return (
-    <div className="overflow-x-auto rounded-lg border border-border">
-      <Table className="text-sm">
-        <TableHeader>
-          <TableRow className="hover:bg-transparent">
-            <TableHead>参数类型</TableHead>
-            <TableHead>版本号</TableHead>
-            <TableHead className="text-right">覆盖率</TableHead>
-            <TableHead>生效时间</TableHead>
-            <TableHead>状态</TableHead>
-            <TableHead className="text-right">操作</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {task.paramVersions.map((p) => (
-            <TableRow key={p.type}>
-              <TableCell className="font-medium text-foreground">{p.type}</TableCell>
-              <TableCell className="font-mono text-xs text-muted-foreground">{p.version}</TableCell>
-              <TableCell className={cn('text-right tabular-nums', p.coverage < 95 ? 'text-[oklch(0.5_0.13_60)]' : 'text-success')}>
-                {p.coverage}%
-              </TableCell>
-              <TableCell className="text-xs text-muted-foreground">{p.effectiveAt}</TableCell>
-              <TableCell className="text-xs text-muted-foreground">{p.status}</TableCell>
-              <TableCell className="text-right">
-                <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">查看</Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <div className="flex flex-col gap-4">
+      <div>
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-sm font-medium text-foreground">计划参数</p>
+          <span className="font-mono text-xs text-muted-foreground">
+            {task.paramVersionTag}· 覆盖率 {task.paramCoverage}%
+          </span>
+        </div>
+        <div className="overflow-hidden rounded-lg border border-border">
+          <Table className="text-sm">
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead>参数项</TableHead>
+                <TableHead className="text-right">取值</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {planRows.map((r) => (
+                <TableRow key={r.label}>
+                  <TableCell className="font-medium text-foreground">{r.label}</TableCell>
+                  <TableCell className="text-right tabular-nums">{r.value}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      <div>
+        <p className="mb-2 text-sm font-medium text-foreground">外部参数（独立展示）</p>
+        <div className="overflow-hidden rounded-lg border border-border">
+          <Table className="text-sm">
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead>参数项</TableHead>
+                <TableHead className="text-right">取值</TableHead>
+                <TableHead>来源</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {task.externalParams.map((p) => (
+                <TableRow key={p.key}>
+                  <TableCell className="font-medium text-foreground">
+                    {p.label}
+                    <span className="ml-1 font-mono text-[11px] text-muted-foreground">{p.key}</span>
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">{p.value}</TableCell>
+                  <TableCell>
+                    <span
+                      className={cn(
+                        'inline-flex items-center rounded border px-1.5 py-0.5 text-[11px]',
+                        p.fallback
+                          ? 'border-warning/40 bg-warning/15 text-[oklch(0.5_0.13_60)]'
+                          : 'border-success/30 bg-success/12 text-success',
+                      )}
+                    >
+                      {p.source}
+                      {p.fallback && ' · 兜底'}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        <p className="mt-1.5 text-xs text-muted-foreground">
+          MOQ 与生产提前期优先取 SCM 供应商数据，缺失时回落至 MRP Supplier Config 默认配置。
+        </p>
+      </div>
     </div>
   )
 }

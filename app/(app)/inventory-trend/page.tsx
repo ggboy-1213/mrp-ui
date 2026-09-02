@@ -46,7 +46,7 @@ const chartConfig = {
   endInventory: { label: '预计期末库存', color: 'var(--chart-4)' },
 } satisfies ChartConfig
 
-export default function InventoryTrendPage() {
+export default function InventoryTrendPage({ embedded = false }: { embedded?: boolean }) {
   const [density, setDensity] = useState<'comfortable' | 'compact'>('comfortable')
 
   const stats: StatTile[] = [
@@ -79,16 +79,18 @@ export default function InventoryTrendPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        title="库存趋势"
-        subtitle="查看未来 21 周的需求、到货、期末库存与缺口变化，识别缺货区间与高库存区间。"
-        actions={
-          <>
-            <Button variant="outline" size="sm" className="gap-1.5"><RefreshCw className="size-4" />刷新数据</Button>
-            <Button variant="outline" size="sm" className="gap-1.5"><Download className="size-4" />导出</Button>
-          </>
-        }
-      />
+      {!embedded && (
+        <PageHeader
+          title="库存趋势"
+          subtitle="查看未来 21 周的需求、到货、期末库存与缺口变化，识别缺货区间与高库存区间。"
+          actions={
+            <>
+              <Button variant="outline" size="sm" className="gap-1.5"><RefreshCw className="size-4" />刷新数据</Button>
+              <Button variant="outline" size="sm" className="gap-1.5"><Download className="size-4" />导出</Button>
+            </>
+          }
+        />
+      )}
 
       <FilterBar>
         <FilterInput label="SPU" />

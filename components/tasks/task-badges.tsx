@@ -59,10 +59,10 @@ export function ValidationBadge({ status }: { status: ValidationStatus }) {
 
 const stageIcon: Record<TaskStage, typeof FileEdit> = {
   草稿: FileEdit,
-  数据准备: Database,
-  数据校验: ShieldCheck,
-  数据快照: Camera,
+  数据检查: ShieldCheck,
+  计算快照: Camera,
   MRP计算: Cpu,
+  结果分析: Database,
   人工调整: SlidersHorizontal,
   待确认: CircleCheckBig,
   已发布: Rocket,

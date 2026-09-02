@@ -79,21 +79,23 @@ const returnColumns: Column<ReturnRow>[] = [
   { key: 'expectAt', header: '预计可用日期', render: (r) => r.expectAt },
 ]
 
-export default function DemandInventoryPage() {
+export default function DemandInventoryPage({ embedded = false }: { embedded?: boolean }) {
   const [density, setDensity] = useState<'comfortable' | 'compact'>('comfortable')
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        title="需求与库存"
-        subtitle="统一查看需求预测与库存输入数据，包含期初库存、平台库存、订单占用与可用退货，作为 MRP 计算的核心输入。"
-        actions={
-          <>
-            <Button variant="outline" size="sm" className="gap-1.5"><RefreshCw className="size-4" />同步数据</Button>
-            <Button variant="outline" size="sm" className="gap-1.5"><Download className="size-4" />导出</Button>
-          </>
-        }
-      />
+      {!embedded && (
+        <PageHeader
+          title="需求与库存"
+          subtitle="统一查看需求预测与库存输入数据，包含期初库存、平台库存、订单占用与可用退货，作为 MRP 计算的核心输入。"
+          actions={
+            <>
+              <Button variant="outline" size="sm" className="gap-1.5"><RefreshCw className="size-4" />同步数据</Button>
+              <Button variant="outline" size="sm" className="gap-1.5"><Download className="size-4" />导出</Button>
+            </>
+          }
+        />
+      )}
 
       <FilterBar>
         <FilterField label="数据版本">

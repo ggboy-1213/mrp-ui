@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Plus, Copy, Download } from 'lucide-react'
 import { taskList, validationSteps, calculationSteps } from '@/lib/task-data'
@@ -8,7 +9,6 @@ import type { PlanTask } from '@/lib/task-types'
 import { TaskStatsCards, statCardDefs, type StatCard } from '@/components/tasks/task-stats-cards'
 import { TaskToolbar, emptyFilters, type TaskFilters } from '@/components/tasks/task-toolbar'
 import { TaskTable } from '@/components/tasks/task-table'
-import { TaskDetailSheet } from '@/components/tasks/task-detail-sheet'
 import { CreateTaskDialog } from '@/components/tasks/create-task-dialog'
 import { ProcessDialog, type ProcessKind } from '@/components/tasks/process-dialog'
 import { TaskToast, type ToastState } from '@/components/tasks/task-toast'
@@ -16,10 +16,10 @@ import { TaskToast, type ToastState } from '@/components/tasks/task-toast'
 // 昨日环比（模拟）
 const DELTAS: Record<string, number> = {
   进行中: 2,
-  待校验: 1,
-  校验失败: -1,
+  待检查: 1,
+  检查失败: -1,
   计算中: 1,
-  待调整: 3,
+  计算完成: 3,
   待确认: -2,
 }
 
@@ -27,31 +27,30 @@ const DELTAS: Record<string, number> = {
 const QUICK_PREDICATE: Record<string, (t: PlanTask) => boolean> = {
   全部任务: () => true,
   我的任务: (t) => t.mine,
-  进行中: (t) => ['计算中', '调整中'].includes(t.status),
-  有异常: (t) => t.exceptionCount > 0 || ['校验失败', '计算失败'].includes(t.status),
-  待我处理: (t) => t.mine && ['待校验', '待计算', '待调整', '待确认', '校验失败', '计算失败'].includes(t.status),
+  进行中: (t) => ['计算中', '调整中', '检查中'].includes(t.status),
+  有异常: (t) => t.exceptionCount > 0 || ['检查失败', '计算失败'].includes(t.status),
+  待我处理: (t) => t.mine && ['待检查', '待计算', '计算完成', '待确认', '检查失败', '计算失败'].includes(t.status),
   今日创建: (t) => t.createdAt.startsWith('2026-07-31'),
   已完成: (t) => ['已确认', '已发布'].includes(t.status),
 }
 
 // 统计卡片 -> 状态集合
 const STAT_STATUS: Record<string, string[]> = {
-  进行中: ['计算中', '调整中'],
-  待校验: ['待校验'],
-  校验失败: ['校验失败'],
+  进行中: ['计算中', '调整中', '检查中'],
+  待检查: ['待检查'],
+  检查失败: ['检查失败'],
   计算中: ['计算中'],
-  待调整: ['待调整', '调整中'],
+  计算完成: ['计算完成', '调整中'],
   待确认: ['待确认'],
 }
 
 export default function TasksPage() {
+  const router = useRouter()
   const [tasks] = useState<PlanTask[]>(taskList)
   const [quick, setQuick] = useState('全部任务')
   const [filters, setFilters] = useState<TaskFilters>(emptyFilters)
   const [statKey, setStatKey] = useState<string | null>(null)
 
-  const [detailTask, setDetailTask] = useState<PlanTask | null>(null)
-  const [detailOpen, setDetailOpen] = useState(false)
   const [createOpen, setCreateOpen] = useState(false)
   const [process, setProcess] = useState<{ open: boolean; kind: ProcessKind; task: PlanTask | null }>({
     open: false,
@@ -92,8 +91,7 @@ export default function TasksPage() {
   }, [tasks, quick, statKey, filters])
 
   const openDetail = (task: PlanTask) => {
-    setDetailTask(task)
-    setDetailOpen(true)
+    router.push(`/tasks/${task.id}`)
   }
 
   // 动态操作分发
@@ -223,9 +221,6 @@ export default function TasksPage() {
 
       {/* 任务表格 */}
       <TaskTable tasks={filtered} onOpenDetail={openDetail} onAction={handleAction} />
-
-      {/* 详情抽屉 */}
-      <TaskDetailSheet task={detailTask} open={detailOpen} onOpenChange={setDetailOpen} onAction={handleAction} />
 
       {/* 新建向导 */}
       <CreateTaskDialog

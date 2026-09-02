@@ -97,22 +97,24 @@ const supplierColumns: Column<SupplierPerf>[] = [
   },
 ]
 
-export default function SupplyLogisticsPage() {
+export default function SupplyLogisticsPage({ embedded = false }: { embedded?: boolean }) {
   const [density, setDensity] = useState<'comfortable' | 'compact'>('comfortable')
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        title="供应与物流"
-        subtitle="维护供应商、采购在途及各段物流时效，用于补货时间反推计算，并联动到货延迟预警。"
-        actions={
-          <>
-            <Button variant="outline" size="sm" className="gap-1.5"><RefreshCw className="size-4" />同步 SCM</Button>
-            <Button variant="outline" size="sm" className="gap-1.5"><Download className="size-4" />导出</Button>
-            <Button size="sm" className="gap-1.5"><Plus className="size-4" />新建采购单</Button>
-          </>
-        }
-      />
+      {!embedded && (
+        <PageHeader
+          title="供应与物流"
+          subtitle="维护供应商、采购在途及各段物流时效，用于补货时间反推计算，并联动到货延迟预警。"
+          actions={
+            <>
+              <Button variant="outline" size="sm" className="gap-1.5"><RefreshCw className="size-4" />同步 SCM</Button>
+              <Button variant="outline" size="sm" className="gap-1.5"><Download className="size-4" />导出</Button>
+              <Button size="sm" className="gap-1.5"><Plus className="size-4" />新建采购单</Button>
+            </>
+          }
+        />
+      )}
 
       <StatTiles items={supplyStats} columns={4} />
 

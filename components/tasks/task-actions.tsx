@@ -22,25 +22,25 @@ export function getTaskActions(status: TaskStatus): TaskAction[] {
     case '草稿':
       return [
         { key: 'edit', label: '编辑' },
-        { key: 'validate', label: '开始校验' },
+        { key: 'validate', label: '开始检查' },
         { key: 'delete', label: '删除', danger: true },
       ]
-    case '待校验':
+    case '待检查':
       return [
-        { key: 'validate', label: '开始校验' },
+        { key: 'validate', label: '开始检查' },
         { key: 'edit', label: '编辑' },
         { key: 'delete', label: '删除', danger: true },
       ]
-    case '校验失败':
+    case '检查失败':
       return [
         { key: 'view-exceptions', label: '查看异常' },
-        { key: 'revalidate', label: '重新校验' },
-        { key: 'edit-data', label: '编辑数据版本' },
+        { key: 'revalidate', label: '重新检查' },
+        { key: 'view-check', label: '查看检查明细' },
       ]
     case '待计算':
       return [
         { key: 'calculate', label: '发起计算' },
-        { key: 'view-snapshot', label: '查看数据快照' },
+        { key: 'view-snapshot', label: '查看计算快照' },
       ]
     case '计算中':
       return [
@@ -54,7 +54,7 @@ export function getTaskActions(status: TaskStatus): TaskAction[] {
         { key: 'recalculate', label: '重新计算' },
         { key: 'copy', label: '复制任务' },
       ]
-    case '待调整':
+    case '计算完成':
       return [
         { key: 'adjust', label: '进入人工调整' },
         { key: 'view-suggestions', label: '查看计划建议' },

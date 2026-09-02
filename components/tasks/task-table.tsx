@@ -27,18 +27,18 @@ function ProgressCell({ task }: { task: PlanTask }) {
       </div>
     )
   }
-  if (task.validation === '校验中') {
+  if (task.validation === '检查中') {
     return (
       <div className="w-32">
         <div className="mb-1 flex items-center justify-between text-xs">
-          <span className="text-primary">数据校验</span>
+          <span className="text-primary">数据检查</span>
           <span className="tabular-nums text-muted-foreground">{task.progress}%</span>
         </div>
         <Progress value={task.progress} className="h-1.5" />
       </div>
     )
   }
-  const failed = task.status === '校验失败' || task.status === '计算失败'
+  const failed = task.status === '检查失败' || task.status === '计算失败'
   return (
     <span
       className={cn(
@@ -68,9 +68,9 @@ export function TaskTable({
             <TableHead className="sticky left-0 z-20 bg-card">任务编号 / 名称</TableHead>
             <TableHead>计划周期</TableHead>
             <TableHead className="min-w-[240px]">计划范围</TableHead>
-            <TableHead>数据版本</TableHead>
+            <TableHead>计算快照</TableHead>
             <TableHead>参数版本</TableHead>
-            <TableHead className="min-w-[160px]">数据校验</TableHead>
+            <TableHead className="min-w-[160px]">数据检查</TableHead>
             <TableHead>当前阶段</TableHead>
             <TableHead className="min-w-[140px]">执行进度</TableHead>
             <TableHead>任务状态</TableHead>
@@ -110,7 +110,7 @@ export function TaskTable({
               <TableCell>
                 <ScopeTags scope={t.scope} />
               </TableCell>
-              <TableCell className="font-mono text-xs text-muted-foreground">{t.dataVersionTag}</TableCell>
+              <TableCell className="font-mono text-xs text-muted-foreground">{t.snapshotTag}</TableCell>
               <TableCell className="font-mono text-xs text-muted-foreground">{t.paramVersionTag}</TableCell>
               <TableCell>
                 <ValidationBadge status={t.validation} />
