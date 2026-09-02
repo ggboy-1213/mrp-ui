@@ -33,7 +33,7 @@ import {
 import { toneText, toneSoftBg } from '@/lib/tone'
 import { cn } from '@/lib/utils'
 
-export default function AdjustmentsPage() {
+export default function AdjustmentsPage({ embedded = false }: { embedded?: boolean }) {
   const [rows, setRows] = useState<Adjustment[]>(seed)
   const [density, setDensity] = useState<'comfortable' | 'compact'>('compact')
 
@@ -95,17 +95,19 @@ export default function AdjustmentsPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        title="人工调整"
-        subtitle="对系统生成的补货建议进行人工修改，实时评估对缺货、高库存、采购金额及后续计划周的影响。"
-        actions={
-          <>
-            <Button variant="outline" size="sm" className="gap-1.5"><Save className="size-4" />保存草稿</Button>
-            <Button variant="outline" size="sm" className="gap-1.5"><RefreshCw className="size-4" />重新计算</Button>
-            <Button size="sm" className="gap-1.5"><CheckCircle2 className="size-4" />提交确认</Button>
-          </>
-        }
-      />
+      {!embedded && (
+        <PageHeader
+          title="人工调整"
+          subtitle="对系统生成的补货建议进行人工修改，实时评估对缺货、高库存、采购金额及后续计划周的影响。"
+          actions={
+            <>
+              <Button variant="outline" size="sm" className="gap-1.5"><Save className="size-4" />保存草稿</Button>
+              <Button variant="outline" size="sm" className="gap-1.5"><RefreshCw className="size-4" />重新计算</Button>
+              <Button size="sm" className="gap-1.5"><CheckCircle2 className="size-4" />提交确认</Button>
+            </>
+          }
+        />
+      )}
 
       <StatTiles items={stats} columns={5} />
 

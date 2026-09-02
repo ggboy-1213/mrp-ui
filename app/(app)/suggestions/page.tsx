@@ -31,7 +31,7 @@ import { RefreshCw, SlidersHorizontal, Download, CheckCircle2, GitCompare } from
 
 const PAGE_SIZE = 10
 
-export default function SuggestionsPage() {
+export default function SuggestionsPage({ embedded = false }: { embedded?: boolean }) {
   const [page, setPage] = useState(1)
   const [density, setDensity] = useState<'comfortable' | 'compact'>('comfortable')
   const [active, setActive] = useState<Suggestion | null>(null)
@@ -78,19 +78,21 @@ export default function SuggestionsPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        title="计划建议"
-        subtitle="展示 MRP 计算后生成的采购、补货、发运与调拨建议，支持批量调整、版本对比与提交确认。"
-        actions={
-          <>
-            <Button variant="outline" size="sm" className="gap-1.5"><RefreshCw className="size-4" />重新计算</Button>
-            <Button variant="outline" size="sm" className="gap-1.5"><SlidersHorizontal className="size-4" />批量调整</Button>
-            <Button variant="outline" size="sm" className="gap-1.5"><GitCompare className="size-4" />版本对比</Button>
-            <Button variant="outline" size="sm" className="gap-1.5"><Download className="size-4" />导出计划</Button>
-            <Button size="sm" className="gap-1.5"><CheckCircle2 className="size-4" />提交确认</Button>
-          </>
-        }
-      />
+      {!embedded && (
+        <PageHeader
+          title="计划建议"
+          subtitle="展示 MRP 计算后生成的采购、补货、发运与调拨建议，支持批量调整、版本对比与提交确认。"
+          actions={
+            <>
+              <Button variant="outline" size="sm" className="gap-1.5"><RefreshCw className="size-4" />重新计算</Button>
+              <Button variant="outline" size="sm" className="gap-1.5"><SlidersHorizontal className="size-4" />批量调整</Button>
+              <Button variant="outline" size="sm" className="gap-1.5"><GitCompare className="size-4" />版本对比</Button>
+              <Button variant="outline" size="sm" className="gap-1.5"><Download className="size-4" />导出计划</Button>
+              <Button size="sm" className="gap-1.5"><CheckCircle2 className="size-4" />提交确认</Button>
+            </>
+          }
+        />
+      )}
 
       <FilterBar>
         <FilterInput label="SPU" />
