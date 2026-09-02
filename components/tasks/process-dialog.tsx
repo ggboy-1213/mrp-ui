@@ -57,7 +57,7 @@ export function ProcessDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg" showCloseButton={finished}>
         <DialogHeader>
-          <DialogTitle>{kind === 'validate' ? '数据校验' : 'MRP 计算'}进行中</DialogTitle>
+          <DialogTitle>{kind === 'validate' ? 'SCM 数据检查' : 'MRP 计算'}进行中</DialogTitle>
           <DialogDescription>{task?.name}</DialogDescription>
         </DialogHeader>
 
@@ -129,7 +129,7 @@ function ResultView({ kind, hasBlocking, task }: { kind: ProcessKind; hasBlockin
         ) : (
           <CircleCheckBig className="size-6 text-success" />
         )}
-        <p className="font-medium text-foreground">{hasBlocking ? '校验未通过' : '校验完成'}</p>
+        <p className="font-medium text-foreground">{hasBlocking ? '检查未通过' : '检查完成'}</p>
       </div>
       <div className="grid grid-cols-3 gap-2">
         <ResultStat label="通过项" value={s.passed} tone="text-success" />

@@ -43,10 +43,10 @@ const toneRing: Record<Tone, string> = {
 
 export const statCardDefs: Omit<StatCard, 'count' | 'delta'>[] = [
   { key: '进行中', label: '进行中任务', tone: 'primary', icon: Loader2 },
-  { key: '待校验', label: '待数据校验', tone: 'warning', icon: AlertTriangle },
-  { key: '校验失败', label: '校验失败', tone: 'danger', icon: XCircle },
+  { key: '待检查', label: '待数据检查', tone: 'warning', icon: AlertTriangle },
+  { key: '检查失败', label: '检查失败', tone: 'danger', icon: XCircle },
   { key: '计算中', label: '计算中', tone: 'mrp', icon: Cpu },
-  { key: '待调整', label: '待人工调整', tone: 'warning', icon: SlidersHorizontal },
+  { key: '计算完成', label: '待人工调整', tone: 'warning', icon: SlidersHorizontal },
   { key: '待确认', label: '待确认发布', tone: 'warning', icon: CircleCheckBig },
 ]
 

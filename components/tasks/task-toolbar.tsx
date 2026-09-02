@@ -39,9 +39,9 @@ export const emptyFilters: TaskFilters = {
 
 const QUICK_FILTERS = ['全部任务', '我的任务', '进行中', '有异常', '待我处理', '今日创建', '已完成']
 
-const STATUS_OPTIONS: TaskStatus[] = ['草稿', '待校验', '校验失败', '待计算', '计算中', '计算失败', '待调整', '调整中', '待确认', '已确认', '已发布', '已取消']
-const STAGE_OPTIONS: TaskStage[] = ['草稿', '数据准备', '数据校验', '数据快照', 'MRP计算', '人工调整', '待确认', '已发布']
-const VALIDATION_OPTIONS: ValidationStatus[] = ['未校验', '校验中', '校验通过', '校验警告', '校验失败']
+const STATUS_OPTIONS: TaskStatus[] = ['草稿', '待检查', '检查失败', '待计算', '计算中', '计算失败', '计算完成', '调整中', '待确认', '已确认', '已发布', '已取消']
+const STAGE_OPTIONS: TaskStage[] = ['草稿', '数据检查', '计算快照', 'MRP计算', '结果分析', '人工调整', '待确认', '已发布']
+const VALIDATION_OPTIONS: ValidationStatus[] = ['未检查', '检查中', '检查通过', '检查警告', '检查失败']
 const CREATOR_OPTIONS = ['李航', '张伟', '陈曦', '王敏']
 
 export function TaskToolbar({
@@ -116,7 +116,7 @@ export function TaskToolbar({
               <Field label="计划周期">
                 <Input value={draft.cycle} onChange={(e) => update({ cycle: e.target.value })} placeholder="例如 2026 W31" className="h-9" />
               </Field>
-              <Field label="数据校验状态">
+              <Field label="数据检查状态">
                 <Select value={draft.validation} onValueChange={(v) => update({ validation: (v as string) ?? 'all' })}>
                   <SelectTrigger className="h-9 w-full"><SelectValue>{(v: string) => (v === 'all' ? '全部' : v)}</SelectValue></SelectTrigger>
                   <SelectContent>
